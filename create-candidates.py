@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 from os import path
 
 SIZE_THRESHOLD = 1300 * 1024 * 1024 * 1024  # 1.3 TB for LTO-5
@@ -9,31 +10,36 @@ SKIPPING_DIRS = ['@eaDir', 'lost+found']
 
 
 def main():
+    src_dir = sys.argv[1]
+
+    print('Source Dir: ' + src_dir)
+
     candidates = []
     candidates_size = 0
 
     exceeded = False
-    for dir_year in os.listdir('.'):
+    for year_name in os.listdir(src_dir):
+        year_dir = path.join(src_dir, year_name)
         if exceeded:
             break
 
-        if not path.isdir(dir_year):
+        if not path.isdir(year_dir):
             continue
 
-        if not re.match(r'\d{4}', dir_year):
+        if not re.match(r'\d{4}', year_dir):
             continue
 
-        for bundle_item in os.listdir(dir_year):
+        for bundle_name in os.listdir(year_dir):
 
-            if bundle_item in SKIPPING_DIRS:
+            if bundle_name in SKIPPING_DIRS:
                 continue
 
-            bundle_dir = path.join(dir_year, bundle_item)
+            bundle_dir = path.join(year_dir, bundle_name)
 
             if not path.isdir(bundle_dir):
                 continue
 
-            bundle_json = path.join(dir_year, bundle_item + '.json')
+            bundle_json = path.join(year_dir, bundle_name + '.json')
 
             if path.exists(bundle_json):
                 with open(bundle_json, 'r') as f:
@@ -42,11 +48,11 @@ def main():
                     print('Skipping: ' + bundle_dir + ', because it is already taped')
                     continue
 
-            print('Calculating: ' + bundle_item)
+            print('Calculating: ' + bundle_name)
 
             bundle_size = 0
 
-            for root, dirs, files in os.walk(path.join(dir_year, bundle_item), topdown=True):
+            for root, dirs, files in os.walk(path.join(year_dir, bundle_name), topdown=True):
                 for f in files:
                     try:
                         bundle_size += path.getsize(path.join(root, f))
@@ -57,7 +63,7 @@ def main():
                 exceeded = True
                 break
 
-            candidates.append(path.join(dir_year, bundle_item))
+            candidates.append(path.join(year_dir, bundle_name))
             candidates_size += bundle_size
 
             print('Candidates Size: ' + str(candidates_size))
