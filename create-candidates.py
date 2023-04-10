@@ -75,7 +75,10 @@ def main():
     print(candidates_size)
 
     with open('candidates.json', 'w') as f:
-        json.dump(candidates, f, indent=4)
+        json.dump({
+            'root': src_dir,
+            'items': [path.relpath(item, src_dir) for item in candidates],
+        }, f, indent=4)
 
 
 if __name__ == '__main__':
