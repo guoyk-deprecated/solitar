@@ -53,7 +53,7 @@ def main():
 
             bundle_size = 0
 
-            for root, dirs, files in os.walk(path.join(year_dir, bundle_name), topdown=True):
+            for root, dirs, files in os.walk(path.join(year_dir, bundle_name)):
                 for f in files:
                     try:
                         bundle_size += path.getsize(path.join(root, f))
@@ -64,7 +64,9 @@ def main():
                 exceeded = True
                 break
 
-            candidates.append(path.join(year_dir, bundle_name))
+            print("Bundle: " + bundle_name + " is " + str(bundle_size) + " bytes")
+
+            candidates.append(bundle_dir)
             candidates_size += bundle_size
 
             print('Candidates Size: ' + str(candidates_size))
