@@ -19,14 +19,15 @@ def main():
 
     exceeded = False
     for year_name in os.listdir(src_dir):
-        year_dir = path.join(src_dir, year_name)
         if exceeded:
             break
 
-        if not path.isdir(year_dir):
+        if not re.match(r'\d{4}', year_name):
             continue
 
-        if not re.match(r'\d{4}', year_dir):
+        year_dir = path.join(src_dir, year_name)
+
+        if not path.isdir(year_dir):
             continue
 
         for bundle_name in os.listdir(year_dir):
